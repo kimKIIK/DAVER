@@ -137,6 +137,79 @@
             color: #aaa;
             cursor: not-allowed;
         }
+        .comment-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .comment-section h3 {
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        .comment-section form {
+            display: flex;
+            flex-direction: column;
+        }
+        .comment-section textarea {
+            resize: none;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            height: 80px;
+        }
+        .comment-section input {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        .comment-section button {
+            align-self: flex-end;
+            padding: 10px 20px;
+            background-color: #0063b9;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .comment-section button:hover {
+            background-color: #004a8c;
+        }
+        .comments-list {
+            margin-top: 20px;
+            list-style: none;
+            padding: 0;
+        }
+        .comments-list li {
+            background: #f9f9f9;
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .comments-list li .delete-btn {
+            background: red;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .comments-list li .delete-btn:hover {
+            background: darkred;
+        }
+        .warning {
+            font-size: 0.9rem;
+            color: red;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -155,13 +228,24 @@
             <h2>천재 컴퓨터 소년 대도은행 털려던 해커 잡아...</h2>
             <p>(대도뉴스)김지현기자 = 대도은행을 털려던 해커일당을 경찰들이 쫓고 있던 가운데 한 천재소년이 결정적인 단서를 제공했다 하여 화제가 되고 있다 
                 이 소년은 밥 먹는 것보다 컴퓨터가 쉽다고 이야기 할 정도로 컴 터틀 잘 다루는데, 이런 자신의 장기를 이용하여 해커들을 잡는데 큰 역할을 할 수 있었던 것으로 알려졌다 
-                주변 사람들은 "얼굴은 안그렇게 생겨가지고 저런 면이 있어 놀라 다"고 입을 모으고 있다 
+                주변 사람들은 "얼굴은 안그렇게 생겨가지고 저런 면이 있어 놀라 다고 입을 모으고 있다 
                 또한 소년의 담임 선생님은 "학교에서 골찌를 다룰 경도로 공부를 못 한다. 천재라니 말도 안된다" 라고 하였는데 소년의 검손한 점을 말해주는 대목이다 .
                 평소 소년은 컴퓨터 게임을 즐기는데 밥 먹을 때 빼고는 거의 이럼 게 시간몰 보낸다고 한다. 
                 인터넷 없이는 하루도 살 수 없다고 말한 것으로 알려진 이 소년은 정말 컴퓨터를 사랑한다고 한다. 
                 대도시에서는 이 천재소년에게 사회에 공현한 보답으로 '모범 어린이상'을 수여했다.</p>
             <img src="https://via.placeholder.com/400x200" alt="뉴스 이미지">
             <p>(이미지 설명란)</p>
+            <div class="comment-section">
+                <h3>댓글 작성</h3>
+                <form id="comment-form">
+                    <input id="nickname-input" type="text" placeholder="닉네임을 입력하세요...">
+                    <textarea id="comment-input" placeholder="댓글을 입력하세요..."></textarea>
+                    <input id="admin-code-input" type="text" placeholder="관리자 코드 (필요시 입력)">
+                    <button type="button" id="submit-comment">등록</button>
+                </form>
+                <p class="warning">부적절한 댓글(욕설, 도배, 비하발언 등)은 삭제될 수 있습니다.</p>
+                <ul id="comments-list" class="comments-list"></ul>
+            </div>
         </div>
         <aside class="sidebar">
             <div class="realtime-articles">
@@ -237,11 +321,108 @@
         });
 
         renderArticles();
-    </script>
-</body>
-</html>
 
-        renderArticles();
+        const commentForm = document.getElementById("comment-form");
+        const commentInput = document.getElementById("comment-input");
+        const nicknameInput = document.getElementById("nickname-input");
+        const adminCodeInput = document.getElementById("admin-code-input");
+        const commentsList = document.getElementById("comments-list");
+
+        document.getElementById("submit-comment").addEventListener("click", () => {
+            const commentText = commentInput.value.trim();
+            const nickname = nicknameInput.value.trim();
+
+            if (!nickname) {
+                alert("닉네임을 입력하세요!");
+                return;
+            }
+
+            if (commentText) {
+                const commentItem = document.createElement("li");
+                const deleteBtn = document.createElement("button");
+                deleteBtn.textContent = "삭제";
+                deleteBtn.className = "delete-btn";
+
+                deleteBtn.addEventListener("click", () => {
+                    const adminCode = adminCodeInput.value.trim();
+                    if (adminCode === "ADMIN12345") {
+                        commentsList.removeChild(commentItem);
+                    } else {
+                        alert("관리자 코드가 올바르지 않습니다.");
+                    }
+                });
+
+                commentItem.innerHTML = `<strong>${nickname}:</strong> ${commentText}`;
+                commentItem.appendChild(deleteBtn);
+                commentsList.appendChild(commentItem);
+
+                commentInput.value = "";
+                nicknameInput.value = "";
+            } else {
+                alert("댓글을 입력하세요!");
+            }
+        });
+
+        const serverUrl = 'http://localhost:3000';
+
+// 댓글 로드
+function loadComments() {
+    fetch(`${serverUrl}/comments`)
+        .then(res => res.json())
+        .then(data => {
+            commentsList.innerHTML = '';
+            data.forEach(comment => {
+                const commentItem = document.createElement('li');
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = '삭제';
+                deleteBtn.className = 'delete-btn';
+
+                deleteBtn.addEventListener('click', () => {
+                    const adminCode = adminCodeInput.value.trim();
+                    fetch(`${serverUrl}/comments/${comment.id}`, {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ adminCode })
+                    }).then(res => {
+                        if (res.ok) {
+                            loadComments();
+                        } else {
+                            alert('관리자 코드가 올바르지 않습니다.');
+                        }
+                    });
+                });
+
+                commentItem.innerHTML = `<strong>${comment.nickname}:</strong> ${comment.text}`;
+                commentItem.appendChild(deleteBtn);
+                commentsList.appendChild(commentItem);
+            });
+        });
+}
+
+// 댓글 작성
+document.getElementById('submit-comment').addEventListener('click', () => {
+    const nickname = nicknameInput.value.trim();
+    const commentText = commentInput.value.trim();
+
+    if (!nickname || !commentText) {
+        alert('닉네임과 댓글 내용을 입력해주세요!');
+        return;
+    }
+
+    fetch(`${serverUrl}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nickname, text: commentText })
+    }).then(res => res.json()).then(() => {
+        commentInput.value = '';
+        nicknameInput.value = '';
+        loadComments();
+    });
+});
+
+// 초기 댓글 로드
+loadComments();
+
     </script>
 </body>
 </html>
