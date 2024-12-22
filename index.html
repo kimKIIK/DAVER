@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAVER</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #ffffff;
+            color: #0063b9;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        header h1 {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+        nav {
+            background-color: #0063b9;
+            padding: 10px 20px;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 1rem;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            display: flex;
+            padding: 20px;
+            gap: 40px; /* 간격을 넓히기 위해 추가 */
+        }
+        .main-content {
+            flex: 3;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .main-content h2 {
+            color: #333;
+            font-size: 1.5rem;
+        }
+        .main-content p {
+            line-height: 1.6;
+            color: #555;
+        }
+        .main-content img {
+            max-width: 100%;
+            margin: 10px 0;
+        }
+        .sidebar {
+            flex: 1;
+        }
+        .sidebar div {
+            background: white;
+            margin-bottom: 20px;
+            padding: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .sidebar div h3 {
+            font-size: 1.2rem;
+            margin: 0 0 10px 0;
+        }
+        .sidebar div ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar div ul li {
+            margin-bottom: 10px;
+        }
+        .realtime-articles {
+            padding: 10px;
+            background-color: #e6f4e8;
+            border: 1px solid #c1e0c1;
+            color: #333;
+        }
+        .realtime-articles h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        .realtime-articles ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .realtime-articles ul li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            padding: 5px;
+        }
+        .realtime-articles ul li span.rank {
+            display: inline-block;
+            background-color: #0063b9;
+            width: 20px;
+            text-align: center;
+            font-weight: bold;
+            color: #ffffff;
+        }
+        .realtime-articles ul li span.title {
+            flex: 1;
+            margin-left: 10px;
+            color: #000;
+        }
+        .realtime-articles ul li span.change {
+            color: red;
+            font-size: 0.9rem;
+            margin-left: auto;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .pagination button {
+            border: 1px solid #0063b9;
+            background-color: white;
+            color: #0063b9;
+            padding: 5px 10px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+        .pagination button:disabled {
+            background-color: #f0f0f0;
+            color: #aaa;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>DAVER</h1>
+    </header>
+    <nav>
+        <a href="#">뉴스홈</a>
+        <a href="#">정치</a>
+        <a href="#">사회</a>
+        <a href="#">문화</a>
+        <a href="#">스포츠</a>
+    </nav>
+    <div class="container">
+        <div class="main-content">
+            <h2>제목</h2>
+            <p>본문</p>
+            <img src="https://via.placeholder.com/400x200" alt="뉴스 이미지">
+            <p>(이미지 설명란)</p>
+        </div>
+        <aside class="sidebar">
+            <div class="realtime-articles">
+                <h3>실시간 기사</h3>
+                <ul id="realtime-list">
+                    <!-- JavaScript로 내용이 추가됨 -->
+                </ul>
+                <div class="pagination">
+                    <button id="prev-btn" disabled>◀</button>
+                    <span id="page-info">1/2</span>
+                    <button id="next-btn">▶</button>
+                </div>
+            </div>
+            <div>
+                <h3>오늘의 뉴스</h3>
+                <ul>
+                    <li><a>"또봇 파일럿" 정체 밝혀지다!</a></li>
+                    <li><a>___</a></li>
+                    <li><a>___</a></li>
+                    <li><a>오순경 "성형 의혹"에 당황</a></li>
+                    <li><a>세상은 지금 스마트폰 열풍</a></li>
+                </ul>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        const articles = [
+            { rank: 1, title: "또봇 타이탄", change: "NEW" },
+            { rank: 2, title: "또봇 정체", change: "▲" },
+            { rank: 3, title: "또봇 파일럿", change: "▲" },
+            { rank: 4, title: "레트로봇 성공신화", change: "▲" },
+            { rank: 5, title: "고감독___", change: "▲" },
+        ];
+        const itemsPerPage = 5;
+        let currentPage = 1;
+
+        function renderArticles() {
+            const list = document.getElementById("realtime-list");
+            list.innerHTML = "";
+
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageArticles = articles.slice(start, end);
+
+            pageArticles.forEach(article => {
+                const li = document.createElement("li");
+                li.innerHTML = `
+                    <span class="rank">${article.rank}</span>
+                    <span class="title">${article.title}</span>
+                    <span class="change">${article.change}</span>
+                `;
+                list.appendChild(li);
+            });
+
+            document.getElementById("page-info").textContent = `${currentPage}/${Math.ceil(articles.length / itemsPerPage)}`;
+            document.getElementById("prev-btn").disabled = currentPage === 1;
+            document.getElementById("next-btn").disabled = currentPage === Math.ceil(articles.length / itemsPerPage);
+        }
+
+        document.getElementById("prev-btn").addEventListener("click", () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderArticles();
+            }
+        });
+
+        document.getElementById("next-btn").addEventListener("click", () => {
+            if (currentPage < Math.ceil(articles.length / itemsPerPage)) {
+                currentPage++;
+                renderArticles();
+            }
+        });
+
+        renderArticles();
+    </script>
+</body>
+</html>
